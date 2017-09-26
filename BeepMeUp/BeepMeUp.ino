@@ -1,7 +1,10 @@
 #include <MS5611.h>
 
 MS5611 baro;
-int32_t pressure;
+float sea_pressure;
+float pressure;
+float temperature;
+float altitude;
 
 void setup() {
   // Start barometer
@@ -10,11 +13,18 @@ void setup() {
   // Start serial (UART)
   Serial.begin(9600);
   delay(2);
+
+  sea_pressure = 1024.00;
 }
 
 void loop() {
-  // Read pressure
-  pressure = baro.getPressure();
-  // Send pressure via serial (UART);
-  Serial.println(pressure);
+  altitude = getAltitude();
+  Serial.println(altitude);
+  delay(1000);
+}
+
+float getAltitude() {
+  pressure = (float)baro.getPressure()/100;
+  temperature = (float)baro.getTemperature()/100;
+  return ((pow((sea_pressure / pressure), 1/5.257) - 1.0) * (temperature + 273.15)) / 0.0065;
 }
