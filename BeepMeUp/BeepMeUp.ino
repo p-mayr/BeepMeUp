@@ -18,7 +18,7 @@ void setup() {
 }
 
 void loop() {
-  altitude = getAltitude();
+  altitude = lowPassFilter(altitude, getAltitude(),0.1);
   Serial.println(altitude);
   delay(1000);
 }
@@ -27,4 +27,8 @@ float getAltitude() {
   pressure = (float)baro.getPressure()/100;
   temperature = (float)baro.getTemperature()/100;
   return ((pow((sea_pressure / pressure), 1/5.257) - 1.0) * (temperature + 273.15)) / 0.0065;
+}
+
+float lowPassFilter(float old_value, float raw_value, float alpha){
+  return old_value + alpha * (raw_value-old_value);
 }
