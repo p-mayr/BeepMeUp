@@ -22,6 +22,9 @@ void setup() {
   baro.begin();
   sea_pressure = 1024.00;
 
+  // Start LCD16x2
+  setup16x2();
+
   // Set initial times
   time = millis();
   loop_time = time;
@@ -43,6 +46,9 @@ void loop() {
   // Print results
   //Serial.println(altitude);
   Serial.println(vertical_speed);
+
+  // Display values on 16x2 LCD
+  displayValues();
 }
 
 float lowPassFilter(float old_value, float raw_value, float alpha){
