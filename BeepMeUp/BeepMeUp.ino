@@ -1,28 +1,41 @@
 #include <MS5611.h>
 
 // Barometer variables
-MS5611 baro;
-float sea_pressure;
-float pressure;
 float temperature;
-float altitude;
-float vertical_speed;
+float altitude = 330;
+float vertical_speed = 0;
+
+// MPU6050 variables
+float Acc = 0;
+float acc_diff = 0.0;
+float acc_diff_sum = 0.0;
+float calibration_factor = 0.0;
+
+// Kalman
+float velocity;
 
 // Timing
 unsigned long time;
-unsigned long loop_time;
+unsigned long loop_time = 1000;
 
 // Temporary variables
 unsigned long ul_tmp;
 float f_tmp;
 
 void setup() {
-  // Start barometer
-  baro = MS5611();
-  baro.begin();
-  sea_pressure = 1024.00;
+  // set Accelerometer
+  setupAccelerometer();
+  
+  // set barometer
+  setupBaro();
 
-  // Start LCD16x2
+  getVerticalSpeed();
+  getVerticalSpeedAcc();
+  
+  // set kalman
+  kalman_init((double)altitude, (double)(Acc), 0.1, 0.3, millis());
+  
+  // set LCD16x2
   setup16x2();
 
   // Set initial times
@@ -42,10 +55,14 @@ void loop() {
 
   // Calculate vertical speed and altitude
   getVerticalSpeed();
+  getVerticalSpeedAcc();
+  kalman_update((double)altitude, (double)(Acc), millis());
 
-  // Print results
-  //Serial.println(altitude);
-  Serial.println(vertical_speed);
+  Serial.print((int)(vertical_speed*100));
+  Serial.print("\t");
+  Serial.print((int)((Acc)*100));
+  Serial.print("\t");
+  Serial.println((int)(velocity*100));
 
   // Display values on 16x2 LCD
   displayValues();
