@@ -3,12 +3,10 @@
 // Barometer variables
 float temperature;
 float altitude = 330;
-float vertical_speed = 0;
+float velocity_baro = 0;
 
 // MPU6050 variables
 float Acc = 0;
-float acc_diff = 0.0;
-float acc_diff_sum = 0.0;
 float calibration_factor = 0.0;
 
 // Kalman
@@ -31,13 +29,11 @@ void setup() {
 
   getVerticalSpeed();
   getVerticalSpeedAcc();
+  calibration_factor = Acc;
   
   // set kalman
   kalman_init((double)altitude, (double)(Acc), 0.1, 0.3, millis());
   
-  // set LCD16x2
-  setup16x2();
-
   // Set initial times
   time = millis();
   loop_time = time;
@@ -58,14 +54,13 @@ void loop() {
   getVerticalSpeedAcc();
   kalman_update((double)altitude, (double)(Acc), millis());
 
-  Serial.print((int)(vertical_speed*100));
+  Serial.print((int)(velocity_baro*100));
   Serial.print("\t");
   Serial.print((int)((Acc)*100));
   Serial.print("\t");
   Serial.println((int)(velocity*100));
 
-  // Display values on 16x2 LCD
-  displayValues();
+  Buzz();
 }
 
 float lowPassFilter(float old_value, float raw_value, float alpha){

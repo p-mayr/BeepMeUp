@@ -1,7 +1,6 @@
 const int MPU_addr=0x68;  // I2C address of the MPU-6050
 const float acc_scale_factor = 9.81/16384.0;
-int16_t AcX,AcY,AcZ,Tmp,GyX,GyY,GyZ;
-
+int16_t AcX,AcY,AcZ;
 float new_acc;
 
 unsigned int calibration_count = 0;
@@ -24,33 +23,18 @@ void getVerticalSpeedAcc(){
   AcX=Wire.read()<<8|Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)    
   AcY=Wire.read()<<8|Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
   AcZ=Wire.read()<<8|Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
-//  Tmp=Wire.read()<<8|Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
-//  GyX=Wire.read()<<8|Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
-//  GyY=Wire.read()<<8|Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
-//  GyZ=Wire.read()<<8|Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
-//  Serial.print("AcX = "); Serial.print(AcX/acc_scale_factor);
-//  Serial.print(" | AcY = "); Serial.print(AcY/acc_scale_factor);
-//  Serial.print(" | AcZ = "); Serial.print(AcZ/acc_scale_factor);
-//  Serial.print(" | Tmp = "); Serial.print(Tmp/340.00+36.53);  //equation for temperature in degrees C from datasheet
-//  Serial.print(" | GyX = "); Serial.print(GyX);
-//  Serial.print(" | GyY = "); Serial.print(GyY);
-//  Serial.print(" | GyZ = "); Serial.println(GyZ);
 
-  // calculate acceleration vector
+  // calculate acceleration vector in m/s including gravity
   new_acc = sqrt(sq((float)AcX)+sq((float)AcY)+sq((float)AcZ))*acc_scale_factor;
   // filter current acceleration
-  new_acc = lowPassFilter(Acc, new_acc, 0.1);
-  // calculate vertical speed from the difference of the new and the old acceleration
-  acc_diff = lowPassFilter(acc_diff, (new_acc-Acc)*loop_time, 0.1);
-  Acc = new_acc;
+  Acc = lowPassFilter(Acc, new_acc, 0.1);
   calibrateAccelerometer();
   Acc -= calibration_factor;
 }
 
+// Tries to compensate the gravity by applying a "very slow" LP filter to the acceleration
 void calibrateAccelerometer(){
-  if (vertical_speed < 0.1 && vertical_speed > -0.1){
-//    Acc_sum += Acc;
-//    calibration_count++;
+  if (velocity_baro < 0.1 && velocity_baro > -0.1){
     calibration_factor = lowPassFilter(calibration_factor, Acc, 0.05);
   }
 }
