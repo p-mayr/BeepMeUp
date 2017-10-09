@@ -4,6 +4,10 @@
 float temperature;
 float altitude = 330;
 float velocity_baro = 0;
+//float mean_velocity = 0;
+float total_time = 0;
+int count = 0;
+int refresh_frequency = 1000; //in ms == integration time
 
 // MPU6050 variables
 float Acc = 0;
@@ -19,7 +23,7 @@ unsigned long loop_time = 1000;
 // Temporary variables
 unsigned long ul_tmp;
 float f_tmp;
-
+ 
 void setup() {
   // set Accelerometer
   setupAccelerometer();
@@ -44,6 +48,7 @@ void setup() {
 }
 
 void loop() {
+  //while(total_time <= refresh_frequency){
   // Calculate loop time
   ul_tmp = millis();
   loop_time = ul_tmp - time;
@@ -53,13 +58,27 @@ void loop() {
   getVerticalSpeed();
   getVerticalSpeedAcc();
   kalman_update((double)altitude, (double)(Acc), millis());
+  /*mean_velocity += velocity;
+  total_time += loop_time;
+  count++;
+  }*/
 
-  Serial.print((int)(velocity_baro*100));
-  Serial.print("\t");
-  Serial.print((int)((Acc)*100));
-  Serial.print("\t");
-  Serial.println((int)(velocity*100));
+  //Serial.print((velocity_baro*100));
+  //Serial.print("\t");
+  //Serial.print((int)((Acc)*100));
+  //Serial.print("\t");
 
+  total_time += loop_time;
+  count++;
+  if(total_time > refresh_frequency){
+    Serial.println((/*mean_*/velocity/*/count*/),1);
+    Serial.println(count);
+    total_time = 0;
+    count = 0;
+    }
+  /*count = 0;
+  mean_velocity = 0;
+  total_time = 0;*/
   Buzz();
 }
 
