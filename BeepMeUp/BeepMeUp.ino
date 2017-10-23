@@ -8,7 +8,7 @@ float acc_scale_factor_x = 16384.0;
 float acc_scale_factor_y = 16384.0;
 float acc_scale_factor_z = 16384.0;
 //calibration flag
-bool calibration = 1;
+bool calibration = 0;
 //address for eeprom
 int eeaddress = 0;
 //maximum calibration deviation
@@ -46,24 +46,7 @@ unsigned long ul_tmp;
 float f_tmp;
 
 void setup() {
-  EEPROM.get(eeaddress, calibration);
-  //uncomment to force calibration
-  //calibration = 1;
-
-  if(calibration == 0){
-    eeaddress += sizeof(bool);
-    EEPROM.get(eeaddress, acc_scale_factor_x);
-    eeaddress += sizeof(float);
-    EEPROM.get(eeaddress, acc_scale_factor_y);
-    eeaddress += sizeof(float);
-    EEPROM.get(eeaddress, acc_scale_factor_z);
-    eeaddress += sizeof(float);
-    EEPROM.get(eeaddress, final_x);
-    eeaddress += sizeof(float);
-    EEPROM.get(eeaddress, final_y);
-    eeaddress += sizeof(float);
-    EEPROM.get(eeaddress, final_z);
-  }
+    EEPROM.get(0, calibration);
   //set Accelerometer
   setupAccelerometer();
 
@@ -87,7 +70,24 @@ void setup() {
 
 
 void loop() {
-  if(calibration){
+
+  //uncomment to force calibration
+  //calibration = 1;
+  if(!calibration){
+    eeaddress += sizeof(bool);
+    EEPROM.get(eeaddress, acc_scale_factor_x);
+    eeaddress += sizeof(float);
+    EEPROM.get(eeaddress, acc_scale_factor_y);
+    eeaddress += sizeof(float);
+    EEPROM.get(eeaddress, acc_scale_factor_z);
+    eeaddress += sizeof(float);
+    EEPROM.get(eeaddress, final_x);
+    eeaddress += sizeof(float);
+    EEPROM.get(eeaddress, final_y);
+    eeaddress += sizeof(float);
+    EEPROM.get(eeaddress, final_z);
+    eeaddress = 0;
+  }else{
      calibrationAcc();
      acc_scale_factor_z = (one_g_z-final_z);
      acc_scale_factor_x = (one_g_x-final_x);
@@ -106,6 +106,7 @@ void loop() {
     EEPROM.put(eeaddress, final_y);
     eeaddress += sizeof(float);
     EEPROM.put(eeaddress, final_z);
+    eeaddress = 0;
   }
 
   // Calculate loop time
@@ -118,7 +119,6 @@ void loop() {
   getVerticalSpeedAcc();
   kalman_update((double)altitude, (double)(0.8*Acc + 0.2*Acc_diff), millis());
   Serial.println(velocity, 1);
-
 
   Buzz();
 }

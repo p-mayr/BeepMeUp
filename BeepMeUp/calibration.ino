@@ -202,7 +202,7 @@ void calibrationAcc(){
             final_y /= 2;
             one_g_y = mean_caly;
             axis_count ++;
-            EEPROM.put(eeaddress, 0);
+            EEPROM.put(0, 0);
             calibration = 0;
            }else{
             Serial.println("calculating...");
