@@ -1,4 +1,6 @@
+//#include <Adafruit_BMP280.h>
 
+//Adafruit_BMP280 bmp;
 MS5611 baro;
 float sea_pressure;
 float pressure;
@@ -18,7 +20,7 @@ void getVerticalSpeed() {
 
 // Calculates the altitude
 float getAltitude() {
-  pressure = (float)baro.getPressure()/100;
+    pressure = (float)baro.getPressure()/100;
   temperature = (float)baro.getTemperature()/100;
   f_tmp = ((pow((sea_pressure / pressure), 1/5.257) - 1.0) * (temperature + 273.15)) / 0.0065;
   return lowPassFilter(altitude, f_tmp,0.1);
