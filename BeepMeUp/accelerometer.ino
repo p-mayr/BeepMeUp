@@ -29,10 +29,10 @@ AcZ_cor = (float)AcZ-final_z;
   //calculate diffence for further 
   Acc_diff_new = (Acc_old-new_acc)*-1;  
   // filter current acceleration
-  Acc_diff= lowPassFilter(Acc_diff, Acc_diff_new, 0.09);
+  Acc_diff= lowPassFilter(Acc_diff, Acc_diff_new, 0.08);
   Acc_old = Acc;  
   // filter current acceleration
-  Acc = lowPassFilter(Acc, new_acc, 0.09);
+  Acc = lowPassFilter(Acc, new_acc, 0.08);
   
 
 }

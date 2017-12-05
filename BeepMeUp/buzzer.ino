@@ -1,5 +1,3 @@
-
-const int buzzer = 9;
 unsigned long buzzer_start_time;
 boolean buzzing = false;
 double buzz_freq;
@@ -7,10 +5,6 @@ int buzz_duration;
 float climbing_threshold = 0.3;
 float sinking_threshold = -0.5;
 
-void setupBuzzer(){
-  pinMode(buzzer, OUTPUT);
-  buzzer_start_time = time;
-}
 
 void Buzz(){
   if (velocity > 10){     // Avoid unnecessary high pitches
@@ -23,24 +17,24 @@ void Buzz(){
   if (velocity > climbing_threshold
       && !buzzing
       && buzzer_start_time+buzz_duration < time){     // Climbing start
-    tone(buzzer, buzz_freq);
+    toneAC(buzz_freq, buzzerVolume);
     buzzing = true;
     buzzer_start_time = time;
   } else if (velocity < sinking_threshold){     // Sinking start
-    tone(buzzer, 100);
+    toneAC(100, buzzerVolume);
     buzzing = true;
   } else if (buzzing
       && velocity < climbing_threshold){      // Sinking stop
-    noTone(buzzer);
+    noToneAC();
     buzzing = false;
   } else if (buzzing
       && buzzer_start_time+buzz_duration < time){     // Climbing stop
-    noTone(buzzer);
+    noToneAC();
     buzzing = false;
     buzzer_start_time = time;
   } else if (buzzing 
       && velocity > climbing_threshold){ // Adjust climbing frequenzy
-    tone(buzzer, buzz_freq);
+    toneAC(buzz_freq, buzzerVolume);
   }
 }
 
