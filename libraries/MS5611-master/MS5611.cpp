@@ -63,8 +63,7 @@ int32_t	MS5611::getPressure(){
 
 uint32_t MS5611::getRawPressure(){
 	sendCommand(CMD_CONV_D1_BASE+OSR_P*CONV_REG_SIZE);	//read sensor, prepare a data
-	//delayMicroseconds(5500);
-	delay(1+2*OSR_P); 									//wait at least 8.33us for full oversampling
+	delay((1+2*OSR_P)); 									//wait at least 8.33us for full oversampling
 	sendCommand(CMD_ADC_READ); 							//get ready for reading the data
 	return readnBytes(NBYTES_CONV);						//reading the data
 }
@@ -88,8 +87,7 @@ int32_t MS5611::getTemperature(){
 
 uint32_t MS5611::getRawTemperature(){	
 	sendCommand(CMD_CONV_D2_BASE+OSR_T*CONV_REG_SIZE);		//read sensor, prepare a data
-	//delayMicroseconds(5330);
-	delay(1+2*OSR_T); 										//wait at least 8.33us
+	delay((1+2*OSR_T)); 									//wait at least 8.33us
 	sendCommand(CMD_ADC_READ); 								//get ready for reading the data
 	return readnBytes(NBYTES_CONV); 						//reading the data
 }
